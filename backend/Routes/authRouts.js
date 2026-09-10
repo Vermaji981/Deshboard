@@ -10,10 +10,10 @@ const router = express.Router();
 // Memory store fallback if MongoDB Atlas is not yet whitelisted
 const memoryUsers = [];
 
-// Register Route
-router.post("/register", async (req, res) => {
+// Register Handler
+const handleRegister = async (req, res) => {
     try {
-        const { name, email, password, role } = req.body;
+        const { name, email, password, role } = req.body || {};
 
         if (!name || !email || !password) {
             return res.status(400).json({ message: "Please fill all required fields" });
@@ -93,12 +93,12 @@ router.post("/register", async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
-});
+};
 
-// Login Route
-router.post("/login", async (req, res) => {
+// Login Handler
+const handleLogin = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password } = req.body || {};
         if (!email || !password) {
             return res.status(400).json({ message: "Please provide email and password" });
         }
@@ -177,7 +177,14 @@ router.post("/login", async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
-});
+};
+
+// Register Routes (matches both /register and /)
+router.post("/register", handleRegister);
+router.post("/", handleRegister);
+
+// Login Routes (matches both /login and /)
+router.post("/login", handleLogin);
 
 // Get current user profile
 router.get("/me", Protect, async (req, res) => {
