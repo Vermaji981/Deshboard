@@ -1,23 +1,49 @@
 const express = require("express");
 const cors = require("cors");
+const connectDB = require("./config/db");
 
-let app;
+const authRouts = require("./Routes/authRouts");
+const adminRoutes = require("./Routes/adminRoutes");
+const productRoutes = require("./Routes/productRoutes");
 
-try {
-    app = require("../backend/index.js");
-} catch (err) {
-    console.error("Failed to load backend server:", err);
-    const errApp = express();
-    errApp.use(cors());
-    errApp.use(express.json());
-    errApp.all("*", (req, res) => {
-        res.status(500).json({
-            error: "Backend Server Initialization Error",
-            message: err.message,
-            stack: err.stack
-        });
-    });
-    app = errApp;
-}
+const app = express();
+
+// Ensure DB Connection
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        console.error("Database connection middleware error:", err);
+        next();
+    }
+});
+
+// Configure CORS
+app.use(cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+app.use(express.json());
+
+// Routes mounted with /api prefix as well as direct prefix for Vercel rewrites
+app.use("/api/auth", authRouts);
+app.use("/auth", authRouts);
+
+app.use("/api/admin", adminRoutes);
+app.use("/admin", adminRoutes);
+
+app.use("/api/products", productRoutes);
+app.use("/products", productRoutes);
+
+app.get("/api", (req, res) => {
+    res.json({ message: "Backend API is running smoothly!" });
+});
+
+app.get("/", (req, res) => {
+    res.json({ message: "Backend API is running smoothly!" });
+});
 
 module.exports = app;
