@@ -76,7 +76,7 @@ app.get("/api", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-    res.json({ message: "Backend API is running smoothly!" });
+    res.json({ message: "Backend API V99 LIVE!" });
 });
 
 const PORT = process.env.PORT || 5000;
