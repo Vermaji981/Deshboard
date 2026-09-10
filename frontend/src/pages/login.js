@@ -20,33 +20,43 @@ function Login() {
 
     try {
       if (isRegister) {
-        // Register API Call
-        const response = await api.post("/auth/register", {
-          name,
-          email,
-          password,
-          role,
-        });
+        // Register API Call with automatic route fallback
+        let response;
+        try {
+          response = await api.post("/auth/register", { name, email, password, role });
+        } catch (rErr) {
+          if (rErr.response && rErr.response.status === 404) {
+            response = await api.post("/register", { name, email, password, role });
+          } else {
+            throw rErr;
+          }
+        }
 
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
 
-        if (response.data.user.role === "Admin") {
+        if (String(response.data.user?.role).toLowerCase() === "admin") {
           navigate("/dashboard");
         } else {
           navigate("/store");
         }
       } else {
-        // Login API Call
-        const response = await api.post("/auth/login", {
-          email,
-          password,
-        });
+        // Login API Call with automatic route fallback
+        let response;
+        try {
+          response = await api.post("/auth/login", { email, password });
+        } catch (lErr) {
+          if (lErr.response && lErr.response.status === 404) {
+            response = await api.post("/login", { email, password });
+          } else {
+            throw lErr;
+          }
+        }
 
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
 
-        if (String(response.data.user.role).toLowerCase() === "admin") {
+        if (String(response.data.user?.role).toLowerCase() === "admin") {
           navigate("/dashboard");
         } else {
           navigate("/store");
