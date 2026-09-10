@@ -11,23 +11,30 @@ const authRouts = require("./Routes/authRouts");
 const adminRoutes = require("./Routes/adminRoutes");
 const productRoutes = require("./Routes/productRoutes");
 
-// Ensure DB connection on incoming requests safely
-app.use(async (req, res, next) => {
-    try {
-        await connectDB();
-        next();
-    } catch (err) {
-        console.error("Database connection middleware error:", err);
-        next();
-    }
-});
-
 // Configure CORS for all origins and headers
 app.use(cors({
     origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
+// Quick 200 response for OPTIONS preflight
+app.options("*", (req, res) => {
+    res.sendStatus(200);
+});
+
+// Non-blocking DB Connection middleware
+app.use(async (req, res, next) => {
+    if (req.method === "OPTIONS") {
+        return next();
+    }
+    try {
+        await connectDB();
+    } catch (err) {
+        console.warn("DB Connection warning:", err.message);
+    }
+    next();
+});
 
 app.use(express.json());
 
@@ -42,11 +49,11 @@ app.use("/api/products", productRoutes);
 app.use("/products", productRoutes);
 
 app.get("/api", (req, res) => {
-    res.json({ message: "Backend server is running smoothly!" });
+    res.json({ message: "Backend API is running smoothly!" });
 });
 
 app.get("/", (req, res) => {
-    res.json({ message: "Backend server is running smoothly!" });
+    res.json({ message: "Backend API is running smoothly!" });
 });
 
 const PORT = process.env.PORT || 5000;

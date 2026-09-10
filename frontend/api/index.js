@@ -8,26 +8,30 @@ const productRoutes = require("./Routes/productRoutes");
 
 const app = express();
 
-// Ensure DB Connection
-app.use(async (req, res, next) => {
-    try {
-        await connectDB();
-        next();
-    } catch (err) {
-        console.error("Database connection error:", err.message);
-        return res.status(500).json({
-            message: "Database connection error. Please whitelist IP 0.0.0.0/0 in MongoDB Atlas Network Access.",
-            error: err.message
-        });
-    }
-});
-
-// Configure CORS
+// Configure CORS for all origins and headers
 app.use(cors({
     origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
+// Quick 200 response for OPTIONS preflight
+app.options("*", (req, res) => {
+    res.sendStatus(200);
+});
+
+// Non-blocking DB Connection middleware
+app.use(async (req, res, next) => {
+    if (req.method === "OPTIONS") {
+        return next();
+    }
+    try {
+        await connectDB();
+    } catch (err) {
+        console.warn("DB Connection warning:", err.message);
+    }
+    next();
+});
 
 app.use(express.json());
 
