@@ -45,6 +45,17 @@ app.use((req, res, next) => {
     next();
 });
 
+// Direct explicit route handlers for auth endpoints
+app.post("/api/auth/register", authRouts.handleRegister);
+app.post("/api/auth/login", authRouts.handleLogin);
+app.post("/api/register", authRouts.handleRegister);
+app.post("/api/login", authRouts.handleLogin);
+
+app.post("/auth/register", authRouts.handleRegister);
+app.post("/auth/login", authRouts.handleLogin);
+app.post("/register", authRouts.handleRegister);
+app.post("/login", authRouts.handleLogin);
+
 // Routes mounted with /api prefix as well as direct prefix for Vercel rewrites
 app.use("/api/auth", authRouts);
 app.use("/auth", authRouts);
