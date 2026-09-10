@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const dns = require("dns");
 
 let isConnected = 0;
 
@@ -14,28 +13,11 @@ const connectDB = async () => {
 
     try {
         const db = await mongoose.connect(mongoUri, {
-            serverSelectionTimeoutMS: 3000,
-            connectTimeoutMS: 3000
+            serverSelectionTimeoutMS: 5000
         });
         isConnected = db.connections[0].readyState;
         console.log("MongoDB is connected successfully!");
     } catch (error) {
-        // Fallback for Windows local / Serverless DNS SRV lookup issues
-        if (error.message.includes("querySrv") || error.message.includes("ECONNREFUSED")) {
-            try {
-                dns.setServers(["8.8.8.8", "1.1.1.1"]);
-                const db = await mongoose.connect(mongoUri, {
-                    serverSelectionTimeoutMS: 3000,
-                    connectTimeoutMS: 3000
-                });
-                isConnected = db.connections[0].readyState;
-                console.log("MongoDB connected successfully via DNS fallback!");
-                return;
-            } catch (fallbackError) {
-                console.error("MongoDB fallback connection error:", fallbackError.message);
-                throw fallbackError;
-            }
-        }
         console.error("MongoDB connection error:", error.message);
         throw error;
     }
