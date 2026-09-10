@@ -6,7 +6,7 @@ let isConnected = 0;
 const DEFAULT_ATLAS_URI = "mongodb+srv://hv0563163_db_user:97UaSHxzWwrZnrRc@cluster0.faf2mqx.mongodb.net/adminpanel?retryWrites=true&w=majority";
 
 const connectDB = async () => {
-    if (isConnected) {
+    if (isConnected === 1) {
         return;
     }
 
@@ -14,7 +14,8 @@ const connectDB = async () => {
 
     try {
         const db = await mongoose.connect(mongoUri, {
-            serverSelectionTimeoutMS: 10000
+            serverSelectionTimeoutMS: 3000,
+            connectTimeoutMS: 3000
         });
         isConnected = db.connections[0].readyState;
         console.log("MongoDB is connected successfully!");
@@ -24,16 +25,19 @@ const connectDB = async () => {
             try {
                 dns.setServers(["8.8.8.8", "1.1.1.1"]);
                 const db = await mongoose.connect(mongoUri, {
-                    serverSelectionTimeoutMS: 10000
+                    serverSelectionTimeoutMS: 3000,
+                    connectTimeoutMS: 3000
                 });
                 isConnected = db.connections[0].readyState;
                 console.log("MongoDB connected successfully via DNS fallback!");
                 return;
             } catch (fallbackError) {
                 console.error("MongoDB fallback connection error:", fallbackError.message);
+                throw fallbackError;
             }
         }
         console.error("MongoDB connection error:", error.message);
+        throw error;
     }
 };
 

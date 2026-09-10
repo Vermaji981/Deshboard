@@ -14,8 +14,11 @@ app.use(async (req, res, next) => {
         await connectDB();
         next();
     } catch (err) {
-        console.error("Database connection middleware error:", err);
-        next();
+        console.error("Database connection error:", err.message);
+        return res.status(500).json({
+            message: "Database connection error. Please whitelist IP 0.0.0.0/0 in MongoDB Atlas Network Access.",
+            error: err.message
+        });
     }
 });
 
