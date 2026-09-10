@@ -5,18 +5,24 @@ let isConnected = false;
 // Disable buffering so DB operations fail fast when DB is disconnected
 mongoose.set("bufferCommands", false);
 
+// Catch and suppress unhandled background Mongoose connection errors
+mongoose.connection.on("error", (err) => {
+    console.warn("Mongoose background connection warning:", err.message);
+});
+
 const DIRECT_SEEDLIST_URI = "mongodb://hv0563163_db_user:97UaSHxzWwrZnrRc@ac-fvgbbcn-shard-00-00.faf2mqx.mongodb.net:27017,ac-fvgbbcn-shard-00-01.faf2mqx.mongodb.net:27017,ac-fvgbbcn-shard-00-02.faf2mqx.mongodb.net:27017/adminpanel?ssl=true&replicaSet=atlas-13w085-shard-0&authSource=admin&retryWrites=true&w=majority";
 
 const connectDB = async () => {
-    if (isConnected) {
+    if (isConnected || mongoose.connection.readyState === 1) {
+        isConnected = true;
         return true;
     }
 
     const mongoUri = process.env.MONGO_URI || process.env.atlas_URL || DIRECT_SEEDLIST_URI;
 
     try {
-        const db = await mongoose.connect(mongoUri, {
-            serverSelectionTimeoutMS: 2500
+        await mongoose.connect(mongoUri, {
+            serverSelectionTimeoutMS: 2000
         });
         isConnected = true;
         console.log("MongoDB connected successfully!");
