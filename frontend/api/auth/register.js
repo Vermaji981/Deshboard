@@ -1,20 +1,18 @@
-const express = require("express");
-const cors = require("cors");
-const authRouter = require("../Routes/authRouts");
 const connectDB = require("../config/db");
+const authRouter = require("../Routes/authRouts");
 
-const app = express();
-app.use(cors({ origin: "*", methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"] }));
-app.use(express.json());
+module.exports = async (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-app.use(async (req, res, next) => {
-    if (req.method === "OPTIONS") return res.sendStatus(200);
-    try { await connectDB(); } catch(e) {}
-    next();
-});
+    if (req.method === "OPTIONS") {
+        return res.status(200).end();
+    }
 
-app.use(authRouter.handleRegister);
+    try {
+        await connectDB();
+    } catch (e) {}
 
-module.exports = (req, res) => {
-    return app(req, res);
+    return authRouter.handleRegister(req, res);
 };
