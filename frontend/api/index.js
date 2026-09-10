@@ -68,6 +68,10 @@ app.use("/products", productRoutes);
 app.use("/api", authRouts);
 app.use("/", authRouts);
 
+app.get("/api/which-file", (req, res) => {
+    res.json({ file: "frontend/api/index.js", url: req.url, originalUrl: req.originalUrl, path: req.path });
+});
+
 app.get("/api", (req, res) => {
     res.json({ message: "Backend API is running smoothly!" });
 });
