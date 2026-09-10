@@ -49,4 +49,6 @@ app.get("/", (req, res) => {
     res.json({ message: "Backend API is running smoothly!" });
 });
 
-module.exports = app;
+module.exports = (req, res) => {
+    return app(req, res);
+};
