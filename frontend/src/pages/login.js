@@ -54,7 +54,13 @@ function Login() {
       }
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || "Authentication failed. Please check your credentials.");
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err.request) {
+        setError("Backend server se connect nahi ho pa raha hai. Kripya backend deploy karein aur Environment Variable (REACT_APP_API_URL) set karein.");
+      } else {
+        setError(err.message || "Authentication failed. Please check your credentials.");
+      }
     } finally {
       setLoading(false);
     }

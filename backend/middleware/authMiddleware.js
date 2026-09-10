@@ -17,7 +17,7 @@ const Protect = (req, res, next) => {
             });
         }
 
-        const decode = jwt.verify(token, process.env.JWT_SECRET);
+        const decode = jwt.verify(token, process.env.JWT_SECRET || "mysecretkey");
         req.user = decode;
 
         next();
