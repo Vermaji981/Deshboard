@@ -1,6 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 
 const User = require("../models/user");
 const Protect = require("../middleware/authMiddleware");
@@ -22,6 +23,9 @@ const handleRegister = async (req, res) => {
         const normalizedEmail = String(email).toLowerCase().trim();
 
         try {
+            if (mongoose.connection.readyState !== 1) {
+                throw new Error("DB connection not ready");
+            }
             const existingUser = await User.findOne({ email: normalizedEmail });
             if (existingUser) {
                 return res.status(400).json({ message: "User with this email already exists" });
@@ -125,6 +129,9 @@ const handleLogin = async (req, res) => {
         }
 
         try {
+            if (mongoose.connection.readyState !== 1) {
+                throw new Error("DB connection not ready");
+            }
             const user = await User.findOne({ email: normalizedEmail });
             if (user) {
                 const passwordMatch = await bcrypt.compare(password, user.password);
