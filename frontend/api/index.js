@@ -34,12 +34,14 @@ app.use(express.json());
 // Routes mounted with /api prefix as well as direct prefix for Vercel rewrites
 app.use("/api/auth", authRouts);
 app.use("/auth", authRouts);
-
 app.use("/api/admin", adminRoutes);
 app.use("/admin", adminRoutes);
-
 app.use("/api/products", productRoutes);
 app.use("/products", productRoutes);
+
+// Mount authRouts on /api and / so /api/login and /api/register match directly
+app.use("/api", authRouts);
+app.use("/", authRouts);
 
 app.get("/api", (req, res) => {
     res.json({ message: "Backend API is running smoothly!" });
