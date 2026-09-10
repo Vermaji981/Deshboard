@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 
 let isConnected = false;
 
+// Disable buffering so DB operations fail fast when DB is disconnected
+mongoose.set("bufferCommands", false);
+
 const DIRECT_SEEDLIST_URI = "mongodb://hv0563163_db_user:97UaSHxzWwrZnrRc@ac-fvgbbcn-shard-00-00.faf2mqx.mongodb.net:27017,ac-fvgbbcn-shard-00-01.faf2mqx.mongodb.net:27017,ac-fvgbbcn-shard-00-02.faf2mqx.mongodb.net:27017/adminpanel?ssl=true&replicaSet=atlas-13w085-shard-0&authSource=admin&retryWrites=true&w=majority";
 
 const connectDB = async () => {

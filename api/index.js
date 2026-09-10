@@ -15,10 +15,6 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// Quick 200 response for OPTIONS preflight
-app.options("*", (req, res) => {
-    res.sendStatus(200);
-});
 
 // Non-blocking DB Connection middleware
 app.use(async (req, res, next) => {
