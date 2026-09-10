@@ -179,11 +179,14 @@ const handleLogin = async (req, res) => {
     }
 };
 
-// Register Routes (matches both /register and /)
-router.post("/register", handleRegister);
-router.post("/", handleRegister);
+// Attach handlers directly to router for serverless function use
+router.handleRegister = handleRegister;
+router.handleLogin = handleLogin;
 
-// Login Routes (matches both /login and /)
+// Register Routes
+router.post("/register", handleRegister);
+
+// Login Routes
 router.post("/login", handleLogin);
 
 // Get current user profile
