@@ -31,6 +31,20 @@ app.use(async (req, res, next) => {
 
 app.use(express.json());
 
+app.use((req, res, next) => {
+    if (req.path === "/echo" || req.url.includes("echo")) {
+        return res.json({
+            url: req.url,
+            originalUrl: req.originalUrl,
+            baseUrl: req.baseUrl,
+            path: req.path,
+            method: req.method,
+            headers: req.headers
+        });
+    }
+    next();
+});
+
 // Routes mounted with /api prefix as well as direct prefix for Vercel rewrites
 app.use("/api/auth", authRouts);
 app.use("/auth", authRouts);
@@ -49,6 +63,17 @@ app.get("/api", (req, res) => {
 
 app.get("/", (req, res) => {
     res.json({ message: "Backend API is running smoothly!" });
+});
+
+// Catch-all to inspect unmatched requests
+app.use((req, res) => {
+    res.json({
+        debug: "Catch-All Hit",
+        method: req.method,
+        url: req.url,
+        originalUrl: req.originalUrl,
+        path: req.path
+    });
 });
 
 module.exports = (req, res) => {
