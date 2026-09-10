@@ -62,7 +62,17 @@ app.get("/api/which-file", (req, res) => {
 });
 
 app.get("/api", (req, res) => {
-    res.json({ message: "Backend API is running smoothly!" });
+    res.json({
+        message: "Backend API is running smoothly!",
+        url: req.url,
+        originalUrl: req.originalUrl,
+        path: req.path,
+        baseUrl: req.baseUrl,
+        query: req.query,
+        xForwardedUri: req.headers["x-forwarded-uri"],
+        xMatchedPath: req.headers["x-matched-path"],
+        xVercelForwardedPath: req.headers["x-vercel-forwarded-path"]
+    });
 });
 
 app.get("/", (req, res) => {
